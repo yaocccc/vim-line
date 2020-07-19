@@ -6,12 +6,19 @@ augroup lines
     au BufEnter,BufWritePost,TextChanged,TextChangedI * call SetTabline()
 augroup END
 
+let s:git_head = ''
 let g:currentmode={ "n": "NORMAL", "v": "VISUAL", "V": "V-LINE", "\<c-v>": "V-CODE", "i": "INSERT", "R": "R", "r": "R", "Rv": "V-REPLACE", "c": "CMD-IN", "s": "SELECT", "S": "SELECT", "\<c-s>": "SELECT", "t": "TERMINAL"}
+let s:modiMark = get(g:, 'line_modi_mark', '+')
+
 hi User1 ctermbg=24
 hi User2 ctermbg=238
 hi User3 ctermbg=25
+hi StatusLine ctermfg=NONE ctermbg=NONE cterm=NONE
+hi StatusLineNC ctermfg=NONE ctermbg=NONE cterm=NONE
+hi TabLine ctermfg=243 ctermbg=NONE cterm=NONE
+hi TabLineFill ctermfg=NONE ctermbg=NONE cterm=NONE
+hi TabLineSel ctermfg=247 ctermbg=NONE cterm=BOLD
 
-let s:git_head = ''
 func! s:getGit()
     let head = system(printf('cd %s && git branch | grep "*"', expand('%:h')))
     let s:git_head = head[0] ==# '*' ? head[2:len(head)-2] : ''
@@ -49,12 +56,12 @@ func! SetTabline(...)
         if bufexists(i) && buflisted(i)
             let &tabline .= '%' . i . '@Clicktab@'
             let &tabline .= i == bufnr('%') ? ' %3* ' : ' %2* '
-            let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod')?'+':'')
+            let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod') ? s:modiMark : '')
             let &tabline .=  name . ' %*%X'
         endif
         let i += 1
     endwhile
-    let &tabline .= ' %<%=%1* %{strftime("周%a %p%I:%M")} %*'
+    let &tabline .= ' %<%=%1* %{strftime("%p%I:%M")} %*'
 endf
 
 func! Clicktab(minwid, clicks, button, modifiers) abort
