@@ -7,17 +7,13 @@ augroup lines
 augroup END
 
 let s:git_head = ''
-let g:currentmode={ "n": "NORMAL", "v": "VISUAL", "V": "V-LINE", "\<c-v>": "V-CODE", "i": "INSERT", "R": "R", "r": "R", "Rv": "V-REPLACE", "c": "CMD-IN", "s": "SELECT", "S": "SELECT", "\<c-s>": "SELECT", "t": "TERMINAL"}
+let g:line_mode_map=get(g:, 'line_mode_map', { "n": "NORMAL", "v": "VISUAL", "V": "V-LINE", "\<c-v>": "V-CODE", "i": "INSERT", "R": "R", "r": "R", "Rv": "V-REPLACE", "c": "CMD-IN", "s": "SELECT", "S": "SELECT", "\<c-s>": "SELECT", "t": "TERMINAL"})
 let s:modiMark = get(g:, 'line_modi_mark', '+')
 
-hi User1 ctermbg=24
-hi User2 ctermbg=238
-hi User3 ctermbg=25
-hi StatusLine ctermfg=NONE ctermbg=NONE cterm=NONE
-hi StatusLineNC ctermfg=NONE ctermbg=NONE cterm=NONE
-hi TabLine ctermfg=243 ctermbg=NONE cterm=NONE
-hi TabLineFill ctermfg=NONE ctermbg=NONE cterm=NONE
-hi TabLineSel ctermfg=247 ctermbg=NONE cterm=BOLD
+hi LineColor1 ctermbg=24
+hi LineColor2 ctermbg=238
+hi LineColor3 ctermbg=25
+hi LineColor4 ctermbg=NONE
 
 func! s:getGit()
     let head = system(printf('cd %s && git branch | grep "*"', expand('%:h')))
@@ -25,7 +21,7 @@ func! s:getGit()
 endf
 
 func! SetStatusline(...)
-    let &statusline = '%1* %{g:currentmode[mode()]} %* %2* %{GetErrCount()} %* %2*%{GetGitStatus()}%*%=%1* %{GetPathName()} %* %1* %4P %L %l %*'
+    let &statusline = '%#LineColor1# %{g:line_mode_map[mode()]} %#LineColor4# %#LineColor2# %{GetErrCount()} %#LineColor4# %#LineColor2#%{GetGitStatus()}%#LineColor4#%=%#LineColor1# %{GetPathName()} %#LineColor4# %#LineColor1# %4P %L %l %#LineColor4#'
     func! GetErrCount()
         let info = get(b:, 'coc_diagnostic_info', {})
         return 'E' . get(info, 'error', 0)
@@ -50,18 +46,18 @@ func! SetStatusline(...)
 endf
 
 func! SetTabline(...)
-    let &tabline = '%1* BUFFER %*'
+    let &tabline = '%#LineColor1# BUFFER %#LineColor4#'
     let i = 1
     while i <= bufnr('$')
         if bufexists(i) && buflisted(i)
             let &tabline .= '%' . i . '@Clicktab@'
-            let &tabline .= i == bufnr('%') ? ' %3* ' : ' %2* '
+            let &tabline .= i == bufnr('%') ? ' %#LineColor3# ' : ' %#LineColor2# '
             let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod') ? s:modiMark : '')
-            let &tabline .=  name . ' %*%X'
+            let &tabline .=  name . ' %#LineColor4#%X'
         endif
         let i += 1
     endwhile
-    let &tabline .= ' %<%=%1* %{strftime("%p%I:%M")} %*'
+    let &tabline .= ' %<%=%#LineColor1# %{strftime("%p%I:%M")} %#LineColor4#'
 endf
 
 func! Clicktab(minwid, clicks, button, modifiers) abort
