@@ -1,20 +1,30 @@
+let s:line_statusline_enable=get(g:, 'line_statusline_enable', 1)
+let s:line_tabline_enable=get(g:, 'line_tabline_enable', 1)
+
 augroup lines
     au!
-    au FileType * call s:getGit()
-    au VimEnter * call SetStatusline()
-    au VimEnter * call SetTablineTimer()
-    au BufEnter,BufWritePost,TextChanged,TextChangedI * call SetTabline()
+    if s:line_statusline_enable == 1
+        set laststatus=2
+        au FileType * call s:getGit()
+        au VimEnter * call SetStatusline()
+    endif
+    if s:line_tabline_enable == 1
+        set showtabline=2
+        au VimEnter * call SetTablineTimer()
+        au BufEnter,BufWritePost,TextChanged,TextChangedI * call SetTabline()
+    endif
 augroup END
 
-let s:git_head = ''
 let g:line_mode_map=get(g:, 'line_mode_map', { "n": "NORMAL", "v": "VISUAL", "V": "V-LINE", "\<c-v>": "V-CODE", "i": "INSERT", "R": "R", "r": "R", "Rv": "V-REPLACE", "c": "CMD-IN", "s": "SELECT", "S": "SELECT", "\<c-s>": "SELECT", "t": "TERMINAL"})
-let s:modiMark = get(g:, 'line_modi_mark', '+')
+let s:line_modi_mark = get(g:, 'line_modi_mark', '+')
+let s:line_dclick_interval = get(g:, 'line_dclick_interval', 100)
 
 hi LineColor1 ctermbg=24
 hi LineColor2 ctermbg=238
 hi LineColor3 ctermbg=25
 hi LineColor4 ctermbg=NONE
 
+let s:git_head = ''
 func! s:getGit()
     let head = system(printf('cd %s && git branch | grep "*"', expand('%:h')))
     let s:git_head = head[0] ==# '*' ? head[2:len(head)-2] : ''
@@ -52,7 +62,7 @@ func! SetTabline(...)
         if bufexists(i) && buflisted(i)
             let &tabline .= '%' . i . '@Clicktab@'
             let &tabline .= i == bufnr('%') ? ' %#LineColor3# ' : ' %#LineColor2# '
-            let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod') ? s:modiMark : '')
+            let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod') ? s:line_modi_mark : '')
             let &tabline .=  name . ' %#LineColor4#%X'
         endif
         let i += 1
