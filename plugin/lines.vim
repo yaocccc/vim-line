@@ -1,3 +1,8 @@
+if exists('s:loaded')
+  finish
+endif
+let s:loaded = 1
+
 let s:line_statusline_enable=get(g:, 'line_statusline_enable', 1)
 let s:line_tabline_enable=get(g:, 'line_tabline_enable', 1)
 
