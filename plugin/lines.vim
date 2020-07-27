@@ -5,7 +5,7 @@ augroup lines
     au!
     if s:line_statusline_enable == 1
         set laststatus=2
-        au FileType * call s:getGit()
+        au BufEnter * call s:getGit()
         au VimEnter * call SetStatusline()
     endif
     if s:line_tabline_enable == 1
