@@ -10,7 +10,6 @@ augroup lines
     au!
     if s:line_statusline_enable == 1
         set laststatus=2
-        au BufEnter * call s:getGit()
         au VimEnter * call SetStatusline()
     endif
     if s:line_tabline_enable == 1
@@ -29,67 +28,55 @@ hi LineColor2 ctermbg=238
 hi LineColor3 ctermbg=25
 hi LineColor4 ctermbg=NONE
 
-let s:git_head = ''
-func! s:getGit()
-    let head = system(printf('cd %s && git branch | grep "*"', expand('%:h')))
-    let s:git_head = head[0] ==# '*' ? head[2:len(head)-2] : ''
-endf
-
 func! SetStatusline(...)
-    let &statusline = '%#LineColor1# %{g:line_mode_map[mode()]} %#LineColor4# %#LineColor2# %{GetErrCount()} %#LineColor4# %#LineColor2#%{GetGitStatus()}%#LineColor4#%=%#LineColor1# %{GetPathName()} %#LineColor4# %#LineColor1# %4P %L %l %#LineColor4#'
+    let &statusline = '%#LineColor1# %{g:line_mode_map[mode()]} %#LineColor4# %#LineColor2# %{GetErrCount()} %#LineColor4# %#LineColor2#%{GetGitInfo()}%#LineColor4#%=%#LineColor1# %{GetPathName()} %#LineColor4# %#LineColor1# %4P %L %l %#LineColor4#'
     func! GetErrCount()
-        let info = get(b:, 'coc_diagnostic_info', {})
-        return 'E' . get(info, 'error', 0)
+        let l:info = get(b:, 'coc_diagnostic_info', {})
+        return 'E' . get(l:info, 'error', 0)
     endf
-    func! GetGitStatus()
-        if len(s:git_head) == 0
-            return ''
-        endif
-        if get(g:, 'gitgutter_enabled', 0) == 0
-            return printf(' %s ', s:git_head)
-        else
-            let [a, m, r] = GitGutterGetHunkSummary()
-            return printf(' %s +%d ~%d -%d ', s:git_head, a, m, r)
-        endif
+    func! GetGitInfo()
+        let l:head = get(g:, 'coc_git_status', '')
+        let l:status = get(b:, 'coc_git_status', '')
+        return l:head . l:status
     endf
     func! GetPathName()
-        let name = substitute(expand('%'), $PWD . '/', '', '')
-        let name = substitute(name, $HOME, '~', '')
-        let name = len(name) ? name : '[未命名]'
-        return name
+        let l:name = substitute(expand('%'), $PWD . '/', '', '')
+        let l:name = substitute(l:name, $HOME, '~', '')
+        let l:name = len(l:name) ? l:name : '[未命名]'
+        return l:name
     endf
 endf
 
 func! SetTabline(...)
     let &tabline = '%#LineColor1# BUFFER %#LineColor4#'
-    let i = 1
-    while i <= bufnr('$')
-        if bufexists(i) && buflisted(i)
-            let &tabline .= '%' . i . '@Clicktab@'
+    let l:i = 1
+    while l:i <= bufnr('$')
+        if bufexists(l:i) && buflisted(l:i)
+            let &tabline .= '%' . l:i . '@Clicktab@'
             let &tabline .= i == bufnr('%') ? ' %#LineColor3# ' : ' %#LineColor2# '
-            let name = (len(fnamemodify(bufname(i), ':t')) ? fnamemodify(bufname(i), ':t') : '[未命名]') . (getbufvar(i, '&mod') ? s:line_modi_mark : '')
-            let &tabline .=  name . ' %#LineColor4#%X'
+            let l:name = (len(fnamemodify(bufname(l:i), ':t')) ? fnamemodify(bufname(l:i), ':t') : '[未命名]') . (getbufvar(l:i, '&mod') ? s:line_modi_mark : '')
+            let &tabline .=  l:name . ' %#LineColor4#%X'
         endif
-        let i += 1
+        let l:i += 1
     endwhile
     let &tabline .= ' %<%=%#LineColor1# %{strftime("%p%I:%M")} %#LineColor4#'
 endf
 
 func! Clicktab(minwid, clicks, button, modifiers) abort
-    let timerID = get(s:, 'clickTabTimer', 0)
+    let l:timerID = get(s:, 'clickTabTimer', 0)
     if a:clicks == 1 && a:button is# 'l'
-        if timerID == 0
+        if l:timerID == 0
             let s:clickTabTimer = timer_start(100, 'SwitchTab')
-            let timerID = s:clickTabTimer
+            let l:timerID = s:clickTabTimer
         endif
     elseif a:clicks == 2 && a:button is# 'l'
         silent execute 'bd' a:minwid
         let s:clickTabTimer = 0
-        call timer_stop(timerID)
+        call timer_stop(l:timerID)
         call SetTabline()
     endif
     let s:minwid = a:minwid
-    let s:timerID = timerID
+    let s:timerID = l:timerID
     func! SwitchTab(...)
         silent execute 'buffer' s:minwid
         let s:clickTabTimer = 0
@@ -98,7 +85,7 @@ func! Clicktab(minwid, clicks, button, modifiers) abort
 endf
 
 func! SetTablineTimer()
-    let remain_second = 60 - strftime("%S")
+    let l:remain_second = 60 - strftime("%S")
     call timer_start(remain_second * 1000, 'SetTablineTimerAndSetTabline')
     func! SetTablineTimerAndSetTabline(...)
         call SetTabline()
