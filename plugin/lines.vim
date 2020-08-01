@@ -38,7 +38,7 @@ func! SetStatusline(...)
         let l:head = get(g:, 'coc_git_status', '')
         let l:head = l:head != '' ? printf(' %s ', l:head) : ''
         let l:status = get(b:, 'coc_git_status', '')
-        let l:status = l:status != '' ? printf(' %s ', l:status) : ''
+        let l:status = l:status != '' ? printf(' %s ', trim(l:status)) : ''
         return l:head . l:status
     endf
     func! GetPathName()
