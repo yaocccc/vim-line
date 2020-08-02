@@ -3,8 +3,9 @@ if exists('s:loaded')
 endif
 let s:loaded = 1
 
-let s:line_statusline_enable=get(g:, 'line_statusline_enable', 1)
-let s:line_tabline_enable=get(g:, 'line_tabline_enable', 1)
+let s:line_statusline_enable = get(g:, 'line_statusline_enable', 1)
+let s:line_tabline_enable = get(g:, 'line_tabline_enable', 1)
+let s:line_tabline_time_enable = get(g: 'line_tabline_time_enable', 1)
 
 augroup lines
     au!
@@ -14,7 +15,9 @@ augroup lines
     endif
     if s:line_tabline_enable == 1
         set showtabline=2
-        au VimEnter * call SetTablineTimer()
+        if s:line_tabline_time_enable == 1
+            au VimEnter * call SetTablineTimer()
+        endif
         au BufEnter,BufWritePost,TextChanged,TextChangedI * call SetTabline()
     endif
 augroup END
@@ -61,7 +64,9 @@ func! SetTabline(...)
         endif
         let l:i += 1
     endwhile
-    let &tabline .= ' %<%=%#LineColor1# %{strftime("%p%I:%M")} %#LineColor4#'
+    if s:line_tabline_time_enable == 1
+        let &tabline .= ' %<%=%#LineColor1# %{strftime("%p%I:%M")} %#LineColor4#'
+    endif
 endf
 
 func! Clicktab(minwid, clicks, button, modifiers) abort
