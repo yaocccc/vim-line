@@ -1,6 +1,6 @@
 # VIM CLINES
 
-simple statusline & tabline
+simple statusline & tabline plug of vim & nvim
 
 ![avatar](./line.png)
 
@@ -36,8 +36,7 @@ default_color
   hi LineColor3 ctermbg=25
   hi LineColor4 ctermbg=NONE
 
-if you want to add something to you statusline line
-you chould flow those:
+if you want to add something to you statusline:
 
 Example:
   let g:line_statusline_getters = ['CocErrCount', 'GitStatus', 'GitInfo']
