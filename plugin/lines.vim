@@ -1,9 +1,8 @@
-if exists('s:loaded')
-  finish
-endif
+if exists('s:loaded') | finish | endif
 let s:loaded = 1
 
 let g:line_mode_map=get(g:, 'line_mode_map', { "n": "NORMAL", "v": "VISUAL", "V": "V-LINE", "\<c-v>": "V-CODE", "i": "INSERT", "R": "R", "r": "R", "Rv": "V-REPLACE", "c": "CMD-IN", "s": "SELECT", "S": "SELECT", "\<c-s>": "SELECT", "t": "TERMINAL"})
+
 let s:line_statusline_enable = get(g:, 'line_statusline_enable', 1)
 let s:line_tabline_enable = get(g:, 'line_tabline_enable', 1)
 let s:line_tabline_show_time = get(g:, 'line_tabline_show_time', 1)
@@ -11,6 +10,7 @@ let s:line_tabline_show_pwd = get(g:, 'line_tabline_show_pwd', 1)
 let s:line_modi_mark = get(g:, 'line_modi_mark', '+')
 let s:line_pwd_suffix = get(g:, 'line_pwd_suffix', '/')
 let s:line_dclick_interval = get(g:, 'line_dclick_interval', 100)
+let s:line_statusline_getters = get(g:, 'line_statusline_getters', [])
 
 hi LineColor1 ctermbg=24
 hi LineColor2 ctermbg=238
@@ -34,24 +34,11 @@ augroup lines
 augroup END
 
 func! SetStatusline(...)
-    let &statusline = '%#LineColor1# %{g:line_mode_map[mode()]} %#LineColor4# %#LineColor2# %{GetErrCount()} %#LineColor4# %#LineColor2#%{GetGitInfo()}%#LineColor4#%=%#LineColor1# %{GetPathName()} %#LineColor4# %#LineColor1# %4P %L %l %v %#LineColor4#'
-    func! GetErrCount()
-        let l:info = get(b:, 'coc_diagnostic_info', {})
-        return 'E' . get(l:info, 'error', 0)
-    endf
-    func! GetGitInfo()
-        let l:head = get(g:, 'coc_git_status', '')
-        let l:head = l:head != '' ? printf(' %s ', l:head) : ''
-        let l:status = get(b:, 'coc_git_status', '')
-        let l:status = l:status != '' ? printf('%s ', trim(l:status)) : ''
-        return l:head . l:status
-    endf
-    func! GetPathName()
-        let l:name = substitute(expand('%'), $PWD . '/', '', '')
-        let l:name = substitute(l:name, $HOME, '~', '')
-        let l:name = len(l:name) ? l:name : '[未命名]'
-        return l:name
-    endf
+    let &statusline = '%#LineColor1# %{g:line_mode_map[mode()]} %#LineColor4#'
+    for getter in s:line_statusline_getters
+        let &statusline .= ' %#LineColor2#%{'.getter.'()}%#LineColor4#'
+    endfor
+    let &statusline .= '%=%#LineColor1# %{GetPathName()} %#LineColor4# %#LineColor1# %4P %L %l %v %#LineColor4#'
 endf
 
 func! SetTabline(...)
@@ -100,4 +87,11 @@ func! SetTablineTimer()
         call SetTabline()
         call timer_start(60 * 1000, 'SetTabline', { 'repeat': 9999 })
     endf
+endf
+
+func! GetPathName()
+    let l:name = substitute(expand('%'), $PWD . '/', '', '')
+    let l:name = substitute(l:name, $HOME, '~', '')
+    let l:name = len(l:name) ? l:name : '[未命名]'
+    return l:name
 endf
