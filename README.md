@@ -1,8 +1,8 @@
-# VIM CLINES
+# VIM LINES
 
 simple statusline & tabline plug of vim & nvim
 
-![avatar](./line.png)
+![avatar](./screenshots/line1.png)
 
 ## options
 
@@ -36,6 +36,11 @@ default_color
   hi LineColor3 ctermbg=25
   hi LineColor4 ctermbg=NONE
 
+```
+
+![avatar](./screenshots/line2.png)
+
+```usage
 if you want to add something to you statusline:
 
 Example:
@@ -96,6 +101,11 @@ Example:
   hi LineColor3 ctermbg=25                  # 当前buffer块的颜色
   hi LineColor4 ctermbg=NONE                # 中间间隔的颜色
 
+```
+
+![avatar](./screenshots/line2.png)
+
+```usage
 如果你想给你的状态栏添加一些额外内容，请加以下内容添加至你的vim配置中
 例子:
   let g:line_statusline_getters = ['CocErrCount', 'GitStatus', 'GitInfo']
