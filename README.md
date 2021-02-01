@@ -15,6 +15,7 @@ default_options
   let g:line_dclick_interval = 100          # tabline    dclick can close buffer
   let g:line_modi_mark = '+'                # tabline    modified mark
   let g:line_pwd_suffix = '/'               # tabline    suffix of current path
+  let g:line_unnamed_filename = '[unnamed]' # statusline & tabline unnamed filename
   let g:line_statusline_getters = []        # statusline extra some info on statusline getters
   let g:line_mode_map = {"n": "NORMAL",     # statusline mode & display map
                       \  "v": "VISUAL",
@@ -80,6 +81,7 @@ Example:
   let g:line_dclick_interval = 100          # 标题栏 双击的间隔(双击可用于关闭buffer)
   let g:line_modi_mark = '+'                # 标题栏 发生变更的buffer的标记
   let g:line_pwd_suffix = '/'               # 标题栏 展示的当前目录名的后缀
+  let g:line_unnamed_filename = '[unnamed]' # 状态栏 标题栏 未命名文件 文件名
   let g:line_statusline_getters = []        # 状态栏 额外展示的内容的获取方法名 以下有部分使用例子
   let g:line_mode_map = {"n": "NORMAL",     # 状态栏 当前模式和显示内容的映射
                       \  "v": "VISUAL",

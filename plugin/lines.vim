@@ -11,6 +11,7 @@ let s:line_modi_mark = get(g:, 'line_modi_mark', '+')
 let s:line_pwd_suffix = get(g:, 'line_pwd_suffix', '/')
 let s:line_dclick_interval = get(g:, 'line_dclick_interval', 100)
 let s:line_statusline_getters = get(g:, 'line_statusline_getters', [])
+let s:line_unnamed_filename = get(g:, 'line_unnamed_filename', '[unnamed]')
 
 hi LineColor1 ctermbg=24
 hi LineColor2 ctermbg=238
@@ -48,7 +49,7 @@ func! SetTabline(...)
         if bufexists(l:i) && buflisted(l:i)
             let &tabline .= '%' . l:i . '@Clicktab@'
             let &tabline .= i == bufnr('%') ? ' %#LineColor3# ' : ' %#LineColor2# '
-            let l:name = (len(fnamemodify(bufname(l:i), ':t')) ? fnamemodify(bufname(l:i), ':t') : '[未命名]') . (getbufvar(l:i, '&mod') ? s:line_modi_mark : '')
+            let l:name = (len(fnamemodify(bufname(l:i), ':t')) ? fnamemodify(bufname(l:i), ':t') : s:line_unnamed_filename) . (getbufvar(l:i, '&mod') ? s:line_modi_mark : '')
             let &tabline .=  l:name . ' %#LineColor4#%X'
         endif
         let l:i += 1
@@ -92,6 +93,6 @@ endf
 func! GetPathName()
     let l:name = substitute(expand('%'), $PWD . '/', '', '')
     let l:name = substitute(l:name, $HOME, '~', '')
-    let l:name = len(l:name) ? l:name : '[未命名]'
+    let l:name = len(l:name) ? l:name : s:line_unnamed_filename
     return l:name
 endf
